@@ -147,6 +147,7 @@ public class UserController {
 
         User user = JsonUtil.string2Obj(token, User.class);
 
+
         if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，需要强制登录status=10");
         }
