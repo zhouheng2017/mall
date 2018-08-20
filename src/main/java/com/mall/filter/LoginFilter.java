@@ -2,12 +2,12 @@ package com.mall.filter;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
-import com.mall.common.ApplicationContextHelper;
-import com.mall.common.Const;
-import com.mall.common.RequestHolder;
-import com.mall.common.ServerResponse;
+import com.mall.common.*;
 import com.mall.pojo.User;
 import com.mall.service.IUserService;
+import com.mall.util.CookieUtil;
+import com.mall.util.JsonUtil;
+import com.mall.util.RedisPoolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -47,8 +47,13 @@ public class LoginFilter implements Filter {
             return;
 
         }
-        User user = (User) request.getSession().getAttribute(Const.CURRENT_USER);
+//        User user = (User) request.getSession().getAttribute(Const.CURRENT_USER);
 
+        String loginToken = CookieUtil.readLoginToken(RequestHolder.getCurrentRequest());
+
+        String token = RedisPoolUtil.get(loginToken);
+
+        User user = JsonUtil.string2Obj(token, User.class);
 
 
         if (user == null) {
