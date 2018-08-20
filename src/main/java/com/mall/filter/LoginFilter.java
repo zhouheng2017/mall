@@ -49,7 +49,7 @@ public class LoginFilter implements Filter {
         }
 //        User user = (User) request.getSession().getAttribute(Const.CURRENT_USER);
 
-        String loginToken = CookieUtil.readLoginToken(RequestHolder.getCurrentRequest());
+        String loginToken = CookieUtil.readLoginToken(request);
 
         String token = RedisPoolUtil.get(loginToken);
 
