@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://dozer.sourceforge.net
+          http://dozer.sourceforge.net/schema/beanmapping.xsd">
+    <configuration>
+        <map-null>false</map-null>
+        <map-empty-string>false</map-empty-string>
+    </configuration>
+    <mapping date-format="yyyy-MM-dd" >
+        <class-a>com.mall.pojo.Product</class-a>
+        <class-b>com.mall.vo.CartProductVo</class-b>
+
+        <field>
+            <a>mainImage</a>
+            <b>productMainImage</b>
+        </field>
+        <field>
+            <a>name</a>
+            <b>productName</b>
+        </field>
+        <field>
+            <a>subtitle</a>
+            <b>productSubtitle</b>
+        </field>
+        <field>
+            <a>status</a>
+            <b>productStatus</b>
+        </field>
+        <field>
+            <a>price</a>
+            <b>productPrice</b>
+        </field>
+        <field>
+            <a>stock</a>
+            <b>productStock</b>
+        </field>
+
+    </mapping>
+
+    <mapping date-format="yyyy-MM-dd" >
+        <class-a>com.mall.test.User</class-a>
+        <class-b>com.mall.test.USerDO</class-b>
+
+        <!--<field>-->
+        <!--<a>email</a>-->
+        <!--<b>mail</b>-->
+        <!--</field>-->
+    </mapping>
+    <mapping>
+        <class-a>com.mall.vo.CartProductVo</class-a>
+        <class-b>com.mall.test.USerDO</class-b>
+
+
+    </mapping>
+</mappings>
