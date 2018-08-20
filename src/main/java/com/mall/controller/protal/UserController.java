@@ -1,12 +1,14 @@
 package com.mall.controller.protal;
 
 import com.mall.common.*;
+import com.mall.param.UserParam;
 import com.mall.pojo.User;
 import com.mall.service.IUserService;
 import com.mall.util.CookieUtil;
 import com.mall.util.JsonUtil;
 import com.mall.util.RedisPoolUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -135,14 +137,19 @@ public class UserController {
     }
 
     @RequestMapping(value = "/get_information.do", method = RequestMethod.GET)
-    public ServerResponse<User> getInformation() {
+    public ServerResponse<User> getInformation(HttpSession session) {
 //        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        GetSession getSession = new GetSession().invoke();
-        if (getSession.is()) {
-
+        String loginToken = CookieUtil.readLoginToken(RequestHolder.getCurrentRequest());
+        if (StringUtils.isEmpty(loginToken)) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，需要强制登录status=10");
         }
-        User user = getSession.getUser();
+        String token = RedisPoolUtil.get(session.getId());
+
+        User user = JsonUtil.string2Obj(token, User.class);
+
+        if (user == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，需要强制登录status=10");
+        }
 
         return userService.getUserInformation(user.getUsername());
     }
@@ -157,36 +164,5 @@ public class UserController {
         RedisPoolUtil.del(loginToken);
 
         return ServerResponse.createBySuccessMessage("退出成功");
-    }
-
-    private class GetSession {
-        private boolean myResult;
-        private User user;
-
-        boolean is() {
-            return myResult;
-        }
-
-        public User getUser() {
-            return user;
-        }
-
-        public GetSession invoke() {
-            String loginToken = CookieUtil.readLoginToken(RequestHolder.getCurrentRequest());
-            if (StringUtils.isEmpty(loginToken)) {
-                myResult = true;
-                return this;
-            }
-            String token = RedisPoolUtil.get(loginToken);
-
-            user = JsonUtil.string2Obj(token, User.class);
-
-            if (user == null) {
-                myResult = true;
-                return this;
-            }
-            myResult = false;
-            return this;
-        }
     }
 }
