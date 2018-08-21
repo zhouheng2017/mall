@@ -190,11 +190,11 @@ public class UserController {
     }
 
     @RequestMapping("/logout.do")
-    public ServerResponse<User> logout(HttpServletResponse response) {
+    public ServerResponse<User> logout(HttpServletResponse response, HttpServletRequest request) {
 
 //        session.removeAttribute(Const.CURRENT_USER);
-        String loginToken = CookieUtil.readLoginToken(RequestHolder.getCurrentRequest());
-        CookieUtil.delLoginToken(RequestHolder.getCurrentRequest(), response);
+        String loginToken = CookieUtil.readLoginToken(request);
+        CookieUtil.delLoginToken(request, response);
 
         RedisPoolUtil.del(loginToken);
 
