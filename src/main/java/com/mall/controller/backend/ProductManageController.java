@@ -3,13 +3,18 @@ package com.mall.controller.backend;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.mall.common.Const;
+import com.mall.common.RequestHolder;
+import com.mall.common.ResponseCode;
 import com.mall.common.ServerResponse;
 import com.mall.pojo.Product;
 import com.mall.pojo.User;
 import com.mall.service.IFileService;
 import com.mall.service.IProductService;
 import com.mall.service.IUserService;
+import com.mall.util.CookieUtil;
+import com.mall.util.JsonUtil;
 import com.mall.util.PropertiesUtil;
+import com.mall.util.RedisPoolUtil;
 import com.mall.vo.ProductDetailVo;
 import com.mall.vo.ProductListVo;
 import org.apache.commons.lang3.StringUtils;
@@ -96,9 +101,16 @@ public class ProductManageController {
 
     @RequestMapping("richtext_img_upload.do")
     @ResponseBody
-    public Map richtextImgUpload(HttpSession session, @RequestParam(value = "upload_file",required = false) MultipartFile file, HttpServletRequest request, HttpServletResponse response) {
+    public Map richtextImgUpload(@RequestParam(value = "upload_file",required = false) MultipartFile file, HttpServletRequest request, HttpServletResponse response) {
         Map resultMap = Maps.newHashMap();
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+//        User user = (User) session.getAttribute(Const.CURRENT_USER);
+
+        //二期改造
+        String loginToken = CookieUtil.readLoginToken(RequestHolder.getCurrentRequest());
+        String token = RedisPoolUtil.get(loginToken);
+
+        User user = JsonUtil.string2Obj(token, User.class);
+
         if (user == null) {
             resultMap.put("success", false);
             resultMap.put("msg", "请登录管理员");

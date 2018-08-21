@@ -10,6 +10,9 @@ import com.mall.pojo.Category;
 import com.mall.pojo.User;
 import com.mall.service.ICategoryService;
 import com.mall.service.IUserService;
+import com.mall.util.CookieUtil;
+import com.mall.util.JsonUtil;
+import com.mall.util.RedisPoolUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -42,7 +45,13 @@ public class CategoryManageController {
     @RequestMapping(value = "/get_category.do", method = RequestMethod.POST)
     public ServerResponse getCategory(@RequestParam(value = "categoryId", required = false, defaultValue = "0") Integer categoryId, HttpSession session) {
 
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+//        User user = (User) session.getAttribute(Const.CURRENT_USER);
+
+        //二期改造
+        String loginToken = CookieUtil.readLoginToken(RequestHolder.getCurrentRequest());
+        String token = RedisPoolUtil.get(loginToken);
+
+        User user = JsonUtil.string2Obj(token, User.class);
         List<Category> categoryList = null;
         if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录,请登录");
@@ -65,8 +74,14 @@ public class CategoryManageController {
     @RequestMapping(value = "/add_category.do", method = RequestMethod.POST)
     public ServerResponse addCategory(HttpSession session, @RequestParam(value = "parentId", required = false, defaultValue = "0") Integer parentId, @RequestParam("categoryName") String categoryName) {
 
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+//        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        //二期改造
+        String loginToken = CookieUtil.readLoginToken(RequestHolder.getCurrentRequest());
+        String token = RedisPoolUtil.get(loginToken);
+
+        User user = JsonUtil.string2Obj(token, User.class);
         if (user == null) {
+
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录,请登录");
         }
         if (userService.checkAdminRole(user).isSuccess()) {
@@ -82,7 +97,13 @@ public class CategoryManageController {
 
     @RequestMapping("/set_category_name.do")
     public ServerResponse setCategoryName(HttpSession session, @RequestParam("categoryId") Integer categoryId, @RequestParam("categoryName") String categoryName) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+//        User user = (User) session.getAttribute(Const.CURRENT_USER);
+
+        //二期改造
+        String loginToken = CookieUtil.readLoginToken(RequestHolder.getCurrentRequest());
+        String token = RedisPoolUtil.get(loginToken);
+
+        User user = JsonUtil.string2Obj(token, User.class);
         if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录,请登录");
         }

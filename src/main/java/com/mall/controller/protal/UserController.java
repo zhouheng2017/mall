@@ -160,7 +160,7 @@ public class UserController {
             response.getData().setUsername(userCurrent.getUsername());
 
             //放入redis中
-            RedisPoolUtil.setEx(session.getId(), JsonUtil.obj2String(response.getData()), Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
+            RedisPoolUtil.setEx(loginToken, JsonUtil.obj2String(response.getData()), Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
 
 //            session.setAttribute(Const.CURRENT_USER, response.getData());
 
