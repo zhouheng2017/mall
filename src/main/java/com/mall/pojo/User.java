@@ -3,6 +3,7 @@ package com.mall.pojo;
 import lombok.*;
 import org.hibernate.validator.constraints.Email;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Builder
@@ -10,7 +11,8 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements Serializable {
+    public static final Long serialVersionUID = 1L;
     private Integer id;
 
     private String username;
