@@ -39,6 +39,8 @@ public class UserSpringSessionController {
     @RequestMapping(value = "/login.do", method = RequestMethod.GET)
     public ServerResponse login(@RequestParam("username") String username, @RequestParam("password") String password, HttpSession session) {
 
+        int i = 0;
+        int j = 66 / i;
         ServerResponse<User> response = userService.login(username, password);
         if (response.isSuccess()) {
             //放到session中

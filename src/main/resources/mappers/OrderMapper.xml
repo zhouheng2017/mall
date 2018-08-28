@@ -30,16 +30,16 @@
     where id = #{id,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from mmall_order
-    where id = #{id,jdbcType=INTEGER}
+    DELETE FROM mmall_order
+    WHERE id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.mall.pojo.Order" >
-    insert into mmall_order (id, order_no, user_id, 
+    INSERT INTO mmall_order (id, order_no, user_id,
       shipping_id, payment, payment_type, 
       postage, status, payment_time, 
       send_time, end_time, close_time, 
       create_time, update_time)
-    values (#{id,jdbcType=INTEGER}, #{orderNo,jdbcType=BIGINT}, #{userId,jdbcType=INTEGER}, 
+    VALUES (#{id,jdbcType=INTEGER}, #{orderNo,jdbcType=BIGINT}, #{userId,jdbcType=INTEGER},
       #{shippingId,jdbcType=INTEGER}, #{payment,jdbcType=DECIMAL}, #{paymentType,jdbcType=INTEGER}, 
       #{postage,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{paymentTime,jdbcType=TIMESTAMP}, 
       #{sendTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{closeTime,jdbcType=TIMESTAMP}, 
@@ -182,8 +182,8 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.mall.pojo.Order" >
-    update mmall_order
-    set order_no = #{orderNo,jdbcType=BIGINT},
+    UPDATE mmall_order
+    SET order_no = #{orderNo,jdbcType=BIGINT},
       user_id = #{userId,jdbcType=INTEGER},
       shipping_id = #{shippingId,jdbcType=INTEGER},
       payment = #{payment,jdbcType=DECIMAL},
@@ -196,7 +196,7 @@
       close_time = #{closeTime,jdbcType=TIMESTAMP},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=INTEGER}
+    WHERE id = #{id,jdbcType=INTEGER}
   </update>
     <select id="selectByUserIdAndOrderNo" parameterType="map" resultMap="BaseResultMap">
       SELECT <include refid="Base_Column_List"/>
@@ -240,4 +240,20 @@
     SELECT <include refid="Base_Column_List"/>
     FROM mmall_order
   </select>
+    <select id="selectbyOrderStatusAndCreateTime" parameterType="map" resultMap="BaseResultMap">
+      SELECT
+      <include refid="Base_Column_List"/>
+      FROM mmall_order
+      WHERE status = #{stauts}
+      <![CDATA[AND create_time <=  #{createTime}]]>
+      ORDER BY create_time DESC
+
+    </select>
+
+
+  <update id="closeOrderByOrderId" parameterType="map">
+    UPDATE mmall_order
+    SET status = 0
+    WHERE id = #{id}
+  </update>
 </mapper>

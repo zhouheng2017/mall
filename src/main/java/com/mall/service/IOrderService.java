@@ -106,10 +106,18 @@ public interface IOrderService {
 
     /**
      * 管理发送的goods
+     *
      * @param orderNo
      * @return
      */
     ServerResponse<String> manageSendGoods(Long orderNo);
+
+    /**
+     * 关闭订单hour个小时以为未付款的订单进行关闭
+     *
+     * @param hour
+     */
+    void closerOrder(int hour);
 
 }
 

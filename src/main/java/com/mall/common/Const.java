@@ -100,6 +100,9 @@ public class Const {
         String RESPONSE_FAILED = "failed";
     }
 
+    public interface REDIS_LOCK {
+        String CLOSE_ORDER_TASK_LOCK = "CLOSE_ORDER_TASK_LOCK";
+    }
 
 
     public enum PayPlatformEnum{

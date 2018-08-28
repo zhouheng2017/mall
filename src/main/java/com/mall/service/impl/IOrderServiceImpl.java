@@ -33,6 +33,7 @@ import com.mall.vo.OrderVo;
 import com.mall.vo.ShippingVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -837,4 +838,43 @@ public class IOrderServiceImpl implements IOrderService {
         return ServerResponse.createByErrorMessage("失败");
     }
 
+    /**
+     * 关闭订单hour个小时以为未付款的订单进行关闭
+     *
+     * @param hour
+     */
+    @Override
+    public void closerOrder(int hour) {
+
+//        关闭半个小时以内未关闭的订单
+        Date dateTime = DateUtils.addHours(new Date(), -hour);
+
+        List<Order> orderList = orderMapper.selectbyOrderStatusAndCreateTime(Const.OrderStatusEnum.NO_PAY.getCode(), DateTimeUtil.dateToStr(dateTime));
+
+        for (Order order : orderList) {
+            List<OrderItem> orderItemList = orderItemMapper.getbyOrderNo(order.getOrderNo());
+
+            for (OrderItem orderItem : orderItemList) {
+
+                Integer stock = productMapper.selectStockByPrimaryKey(orderItem.getProductId());
+
+                if (stock == null) {
+                    continue;
+
+                }
+
+                Product product = new Product();
+                product.setStock(stock + orderItem.getQuantity());
+
+                product.setId(product.getId());
+                productMapper.updateByPrimaryKeySelective(product);
+
+            }
+            orderMapper.closeOrderByOrderId(order.getId());
+            log.info("关闭订单OrderNo：{}", order.getOrderNo());
+
+
+
+        }
+    }
 }

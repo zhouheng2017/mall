@@ -218,4 +218,11 @@
     </if>
 
   </select>
+     <select id="selectStockByPrimaryKey" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+
+      SELECT stock
+      FROM mmall_product
+      WHERE id = #{productId}
+      FOR UPDATE
+    </select>
 </mapper>
