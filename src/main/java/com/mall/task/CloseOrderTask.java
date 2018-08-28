@@ -1,16 +1,21 @@
 package com.mall.task;
 
 import com.mall.common.Const;
+import com.mall.common.RedissonManager;
 import com.mall.service.IOrderService;
 import com.mall.util.PropertiesUtil;
 import com.mall.util.RedisPoolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.redisson.RedissonLock;
+import org.redisson.RedissonReadLock;
+import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: zhouheng
@@ -25,6 +30,10 @@ public class CloseOrderTask {
 
     @Autowired
     private IOrderService orderService;
+
+    @Autowired
+    private RedissonManager redissonManager;
+
 
     @PreDestroy
     public void delLock() {
@@ -97,8 +106,37 @@ public class CloseOrderTask {
 
     }
 
+    @Scheduled(cron = "* */1 * * * ?")
+    public void closeOrderV4() {
+        RLock lock = redissonManager.getRedisson().getLock(Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK);
+        boolean getLock = false;
+
+        try {
+            if (getLock = lock.tryLock(0, 50, TimeUnit.SECONDS)) {
+                log.info("Redission获取分布式锁：{}， ThreadName:{}", Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK, Thread.currentThread().getName());
+                int hour = Integer.parseInt(PropertiesUtil.getProperty("close.order.timeout", "2"));
+                orderService.closerOrder(hour);
+
+            } else {
+                log.info("Redissionm没有获取分布式锁：{}， ThreadName:{}", Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK, Thread.currentThread().getName());
+
+            }
+
+        } catch (InterruptedException e) {
+            log.info("Redisson分布式锁获取异常", e);
+        }finally {
+            if (!getLock) {
+                return;
+            }
+            lock.unlock();
+            log.info("Redisson分布式锁释放");
+
+        }
+    }
+
 
     private void closeOrder(String lockName) {
+
         RedisPoolUtil.expire(lockName, 5);
         log.info("获取{}， ThreadName：{}", Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK, Thread.currentThread().getName());
 
